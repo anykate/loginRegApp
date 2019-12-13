@@ -4,6 +4,7 @@ from .models import User
 
 # Register your models here.
 class UserAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ["password",]
+
 
 admin.site.register(User, UserAdmin)

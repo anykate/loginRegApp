@@ -31,6 +31,16 @@
 </head>
 
 <body>
+	<div class="container">
+		{% if messages %}
+			{% for message in messages %}
+				<li {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">
+					{{ message }}
+				</li>
+			{% endfor %}
+		{% endif %}
+	</div>
+
 	{% block content %}{% endblock %}
 
 
