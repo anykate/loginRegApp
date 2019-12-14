@@ -21,6 +21,10 @@ class UserManager(models.Manager):
             errors['email'] = 'Email is required'
         elif not EMAIL_REGEX.match(post_data['email']):
             errors['email_pattern'] = 'Invalid Email Address'
+        else:
+            email_match = User.objects.filter(email=post_data['email'])
+            if email_match:
+                errors['email_match'] = 'User already exists'
 
         if len(post_data['pwd']) < 8:
             errors['pwd'] = 'Password is required and should be at least 8 characters long'
