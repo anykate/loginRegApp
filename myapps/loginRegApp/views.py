@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
@@ -6,6 +6,10 @@ from django.contrib import messages
 
 # Create your views here.
 def index(request):
+    try:
+        del request.session['loggedInUserID']
+    except KeyError:
+        pass
     return render(request, 'loginRegApp/index.html', {})
 
 
@@ -19,7 +23,7 @@ def createuser(request):
     validation_errors = User.objects.registration_validator(request.POST)
 
     if validation_errors:
-        for key,value in validation_errors.items():
+        for key, value in validation_errors.items():
             messages.error(request, value)
         return redirect('loginRegApp:index')
     else:
@@ -29,9 +33,15 @@ def createuser(request):
             email=email,
             password=make_password(password) # Never save password(s) as plain text
         )
-        messages.success(request, f'User with email: \"{email}\" created successfully')
+        messages.success(
+            request, f'User with email: \"{email}\" created successfully')
+        request.session['loggedInUserID'] = newuser.id
         return redirect('loginRegApp:success')
 
 
 def success(request):
-    return render(request, 'loginRegApp/success.html', {})
+    id = request.session.get('loggedInUserID')
+    if id:
+        user = get_object_or_404(User, id=id)
+        return render(request, 'loginRegApp/success.html', {'user': user})
+    return redirect('loginRegApp:index')
